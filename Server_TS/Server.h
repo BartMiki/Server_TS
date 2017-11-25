@@ -4,6 +4,11 @@
 #include <WinSock2.h>
 #include <WS2tcpip.h>
 #include "Protocol.h"
+#include "Client.h"
+#include <vector>
+#include <algorithm>
+#include <random>
+#include <chrono>
 
 #pragma comment(lib,"ws2_32.lib") 
 
@@ -15,9 +20,7 @@ public:
 	bool ListenForNewConnections();
 private:
 	// --- data fields ---
-	static const int connectionsSize = 100;
-	SOCKET connections[connectionsSize]; //Array to hold connections
-	int TotalConnections = 0;
+	static vector<Client*> clients;
 	WSAData wsaData;
 	WORD DllVersion;
 	SOCKADDR_IN addr; //Address to bind listening socket to
@@ -25,14 +28,14 @@ private:
 	int addrLen;
 
 	// --- methods send ---
-	bool sendProtocol(int ID, Protocol * protocol);
+	bool sendProtocol(Client * client, Protocol * protocol);
 
 	// --- methods recv ---
-	Protocol * recvProtocol(int ID);
+	Protocol * recvProtocol(Client * client);
 
 	// --- methods other ---
-	bool processProtocol(int ID, Protocol * protocol);
-	static void ClientHandlerThread(int ID);
+	bool processProtocol(Client * client, Protocol * protocol);
+	static void ClientHandlerThread(Client * client);
 };
 
 static Server * serverPtr;
